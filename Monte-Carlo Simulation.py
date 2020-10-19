@@ -50,15 +50,10 @@ def rannumgen(runs):
         v_i = y_i / k   # Formula defined in the appendix
         return v_i
 
-# For question 2A uncomment this section to run it.
-# for i in range(customer_limit):     # Iterates over the span of customers
-#     if(i >= 51 and i <= 53):   # Checks for the range we need
-#         print("Value for i =", i, "is", rannumgen())        # Prints the values
-
 
 # Iterates over the specific range needed
 for i in range(customer_limit):
-    RECALL_LIMIT = 5  # This is the maximum redial possible
+    RECALL_LIMIT = 4  # This is the maximum redial possible
     seconds = 0  # Initial time to start calling someone
 
     print("<->")  # Separates individuals calls from each other
@@ -83,7 +78,6 @@ for i in range(customer_limit):
 
             if (time >= 25):    # Checks if time is over what is needed
                 seconds += 26  # Adds in the maximum seconds
-
             else:   # If time is less than what is needed
                 seconds += time  # This will be x seconds
                 information.append([randomnumber, time, seconds])
@@ -91,12 +85,20 @@ for i in range(customer_limit):
                       time, "showing user picked up in", seconds, "seconds")
                 break   # Exits the loop for this user
 
-        if (j == 4):  # Checks if we are on the last try
+        if (j == 3):  # Checks if we are on the last try
             information.append([randomnumber, time, seconds])
             print("Probability", randomnumber, "gives", "time",
                   time, "showing user did NOT pick up in given time. User picked up in", seconds, "seconds total")
 
 
+# Saving information to a csv file
 with open(FILENAME, "w") as csvfile:
-    csvwriter = csv.writer(csvfile)
-    csvwriter.writerows(information)
+    csvwriter = csv.writer(csvfile)  # Making the writer
+    csvwriter.writerows(information)   # Writes the data that we need.
+
+
+# # For question 2A uncomment this section to run it.
+# for i in range(customer_limit):     # Iterates over the span of customers
+#     if(i >= 50 and i <= 52):   # Checks for the range we need
+#         print("Value for u =", i+1, "is", rannumgen(
+#             'first'))        # Prints the values
