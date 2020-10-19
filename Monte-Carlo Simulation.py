@@ -3,6 +3,7 @@
 
 # Imports needed for the projects.
 import math
+import csv
 
 # Defines variables to be used in the project
 BUSY_PROBABILITY = 0.2
@@ -14,12 +15,15 @@ customer_limit = 500
 BUSY_STRING = "BUSY"
 UNAVAILABLE_STRING = "UNAVAILABLE"
 AVAILABLE_STRING = "AVAILABLE"
+FILENAME = "Monte-Carlo Simulation.csv"
 
 # Defines variables that are changing
 x = 1000
+y = 1000
+information = []
 
 
-def rannumgen():
+def rannumgen(runs):
     """
     Function to provide information for the random number
         generator using the linear congruential random number
@@ -29,15 +33,22 @@ def rannumgen():
         [decimal]: [value of the linear congruential random number]
     """
     global x  # Accesses outside variable
+    global y  # Accesses outside variable
 
     # Set some constants
     a = 9429
     c = 3967
 
-    x_i = ((a * x) + c) % k  # Formula defines in appendix of project
-    x = x_i  # Reassigns the previous value
-    u_i = x_i / k   # Formula defined in the appendix
-    return u_i
+    if (runs == "first"):
+        x_i = ((a * x) + c) % k  # Formula defines in appendix of project
+        x = x_i  # Reassigns the previous value
+        u_i = x_i / k   # Formula defined in the appendix
+        return u_i
+    else:
+        y_i = ((a * y) + c) % k  # Formula defines in appendix of project
+        y = y_i  # Reassigns the previous value
+        v_i = y_i / k   # Formula defined in the appendix
+        return v_i
 
 # For question 2A uncomment this section to run it.
 # for i in range(customer_limit):     # Iterates over the span of customers
@@ -53,7 +64,7 @@ for i in range(customer_limit):
     print("<->")  # Separates individuals calls from each other
 
     for j in range(0, RECALL_LIMIT, 1):     # Redials the user as many times as needed
-        randomnumber = rannumgen()  # Runs the random number generator
+        randomnumber = rannumgen("first")  # Runs the random number generator
         seconds += 6  # Initial time to pick up phone and dial a number
 
         if (randomnumber <= BUSY_PROBABILITY):  # Busy probability
@@ -67,17 +78,25 @@ for i in range(customer_limit):
                 print("Probability", randomnumber,
                       "shows user is unavailable. Redialing...")
         else:   # Available section
-            # Find the time using the inverse function
-            function = -12 * math.log(1 - randomnumber)
+            # Find the time using the inverse time
+            time = -12 * math.log(1 - rannumgen("second"))
 
-            if (function >= 25):    # Checks if time is over what is needed
-                seconds += 26   # Adds in the maximum seconds
+            if (time >= 25):    # Checks if time is over what is needed
+                seconds += 26  # Adds in the maximum seconds
+
             else:   # If time is less than what is needed
-                seconds += function  # This will be x seconds
-                print("Probability", randomnumber, "gives", "function",
-                      function, "showing user picked up in", seconds, "seconds")
+                seconds += time  # This will be x seconds
+                information.append([randomnumber, time, seconds])
+                print("Probability", randomnumber, "gives", "time",
+                      time, "showing user picked up in", seconds, "seconds")
                 break   # Exits the loop for this user
 
-        if(j == 4):  # Checks if we are on the last try
-            print("Probability", randomnumber, "gives", "function",
-                  function, "showing user did NOT pick up in given time. User picked up in", seconds, "seconds")
+        if (j == 4):  # Checks if we are on the last try
+            information.append([randomnumber, time, seconds])
+            print("Probability", randomnumber, "gives", "time",
+                  time, "showing user did NOT pick up in given time. User picked up in", seconds, "seconds total")
+
+
+with open(FILENAME, "w") as csvfile:
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerows(information)
